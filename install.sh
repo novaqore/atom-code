@@ -18,7 +18,7 @@ chmod +x "${BIN_DIR}/atom"
 SHELL_RC=""
 if [ -n "${ZSH_VERSION:-}" ] || [ -f "${HOME}/.zshrc" ]; then
   SHELL_RC="${HOME}/.zshrc"
-elif [ -f "${HOME}/.bashrc" ]; then
+else
   SHELL_RC="${HOME}/.bashrc"
 fi
 
