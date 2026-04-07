@@ -1,17 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-INSTALL_DIR="${HOME}/.atom"
-REPO="https://github.com/novaqore/atom-code.git"
+REPO="novaqore/atom-code"
+BRANCH="main"
+BIN_URL="https://raw.githubusercontent.com/${REPO}/${BRANCH}/bin/atom"
 
-if [ -d "${INSTALL_DIR}/.git" ]; then
-  echo "Updating Atom..."
-  cd "${INSTALL_DIR}"
-  git pull
-else
-  echo "Installing Atom..."
-  git clone "${REPO}" "${INSTALL_DIR}"
-fi
+echo "Installing Atom..."
+curl -fsSL "${BIN_URL}" -o /tmp/atom
+chmod +x /tmp/atom
+sudo mv /tmp/atom /usr/local/bin/atom
 
 echo ""
-echo "Done. Location: ${INSTALL_DIR}"
+echo "Done. Run: atom"
