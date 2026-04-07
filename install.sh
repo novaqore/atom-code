@@ -14,33 +14,24 @@ echo "Downloading binary..."
 curl -fsSL "${BIN_URL}" -o "${BIN_DIR}/atom"
 chmod +x "${BIN_DIR}/atom"
 
-# Ensure .profile exists and sources .bashrc (login shells need this)
-PROFILE="${HOME}/.profile"
-if [ ! -f "${PROFILE}" ]; then
-  cat > "${PROFILE}" << 'PROF'
-if [ -n "$BASH_VERSION" ]; then
-  if [ -f "$HOME/.bashrc" ]; then
-    . "$HOME/.bashrc"
+# Add to PATH if not already there
+SHELL_RC=""
+if [ -n "${ZSH_VERSION:-}" ] || [ -f "${HOME}/.zshrc" ]; then
+  SHELL_RC="${HOME}/.zshrc"
+else
+  SHELL_RC="${HOME}/.bashrc"
+fi
+
+if [ -n "${SHELL_RC}" ]; then
+  if ! grep -q '\.atom/bin' "${SHELL_RC}" 2>/dev/null; then
+    echo '' >> "${SHELL_RC}"
+    echo '# Atom CLI' >> "${SHELL_RC}"
+    echo 'export PATH="$HOME/.atom/bin:$PATH"' >> "${SHELL_RC}"
   fi
-fi
-PROF
-fi
-
-# Add to PATH in .bashrc
-BASHRC="${HOME}/.bashrc"
-if ! grep -q '\.atom/bin' "${BASHRC}" 2>/dev/null; then
-  echo '' >> "${BASHRC}"
-  echo '# Atom CLI' >> "${BASHRC}"
-  echo 'export PATH="$HOME/.atom/bin:$PATH"' >> "${BASHRC}"
-fi
-
-# Also add to .profile directly in case .bashrc sourcing is skipped
-if ! grep -q '\.atom/bin' "${PROFILE}" 2>/dev/null; then
-  echo '' >> "${PROFILE}"
-  echo 'export PATH="$HOME/.atom/bin:$PATH"' >> "${PROFILE}"
 fi
 
 echo ""
 echo "Atom installed successfully!"
+echo "  Location: ${BIN_DIR}/atom"
 echo ""
 echo "Restart your terminal, then run: atom"
