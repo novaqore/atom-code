@@ -14,39 +14,33 @@ echo "Downloading binary..."
 curl -fsSL "${BIN_URL}" -o "${BIN_DIR}/atom"
 chmod +x "${BIN_DIR}/atom"
 
-# Add to PATH if not already there
-SHELL_RC=""
-if [ -n "${ZSH_VERSION:-}" ] || [ -f "${HOME}/.zshrc" ]; then
-  SHELL_RC="${HOME}/.zshrc"
-else
-  SHELL_RC="${HOME}/.bashrc"
-fi
-
-if [ -n "${SHELL_RC}" ]; then
-  if ! grep -q '\.atom/bin' "${SHELL_RC}" 2>/dev/null; then
-    echo '' >> "${SHELL_RC}"
-    echo '# Atom CLI' >> "${SHELL_RC}"
-    echo 'export PATH="$HOME/.atom/bin:$PATH"' >> "${SHELL_RC}"
-    echo "Added ~/.atom/bin to PATH in ${SHELL_RC}"
+# Ensure .profile exists and sources .bashrc (login shells need this)
+PROFILE="${HOME}/.profile"
+if [ ! -f "${PROFILE}" ]; then
+  cat > "${PROFILE}" << 'PROF'
+if [ -n "$BASH_VERSION" ]; then
+  if [ -f "$HOME/.bashrc" ]; then
+    . "$HOME/.bashrc"
   fi
 fi
+PROF
+fi
 
-# Symlink to /usr/local/bin so it works immediately
-LINKED=false
-if [ -d /usr/local/bin ] && [ -w /usr/local/bin ]; then
-  ln -sf "${BIN_DIR}/atom" /usr/local/bin/atom
-  LINKED=true
-elif command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
-  sudo ln -sf "${BIN_DIR}/atom" /usr/local/bin/atom
-  LINKED=true
+# Add to PATH in .bashrc
+BASHRC="${HOME}/.bashrc"
+if ! grep -q '\.atom/bin' "${BASHRC}" 2>/dev/null; then
+  echo '' >> "${BASHRC}"
+  echo '# Atom CLI' >> "${BASHRC}"
+  echo 'export PATH="$HOME/.atom/bin:$PATH"' >> "${BASHRC}"
+fi
+
+# Also add to .profile directly in case .bashrc sourcing is skipped
+if ! grep -q '\.atom/bin' "${PROFILE}" 2>/dev/null; then
+  echo '' >> "${PROFILE}"
+  echo 'export PATH="$HOME/.atom/bin:$PATH"' >> "${PROFILE}"
 fi
 
 echo ""
 echo "Atom installed successfully!"
-echo "  Location: ${BIN_DIR}/atom"
 echo ""
-if [ "$LINKED" = true ]; then
-  echo "Run: atom"
-else
-  echo "Run: source ${SHELL_RC} && atom"
-fi
+echo "Restart your terminal, then run: atom"
