@@ -31,10 +31,15 @@ if [ -n "${SHELL_RC}" ]; then
   fi
 fi
 
+# Symlink to /usr/local/bin so it works immediately
+if [ -d /usr/local/bin ] && [ -w /usr/local/bin ]; then
+  ln -sf "${BIN_DIR}/atom" /usr/local/bin/atom
+elif command -v sudo &>/dev/null; then
+  sudo ln -sf "${BIN_DIR}/atom" /usr/local/bin/atom
+fi
+
 echo ""
 echo "Atom installed successfully!"
 echo "  Location: ${BIN_DIR}/atom"
 echo ""
-echo "To get started:"
-echo "  1. Restart your terminal (or run: source ${SHELL_RC})"
-echo "  2. Run: atom"
+echo "Run: atom"
