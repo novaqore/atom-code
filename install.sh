@@ -32,14 +32,21 @@ if [ -n "${SHELL_RC}" ]; then
 fi
 
 # Symlink to /usr/local/bin so it works immediately
+LINKED=false
 if [ -d /usr/local/bin ] && [ -w /usr/local/bin ]; then
   ln -sf "${BIN_DIR}/atom" /usr/local/bin/atom
-elif command -v sudo &>/dev/null; then
+  LINKED=true
+elif command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
   sudo ln -sf "${BIN_DIR}/atom" /usr/local/bin/atom
+  LINKED=true
 fi
 
 echo ""
 echo "Atom installed successfully!"
 echo "  Location: ${BIN_DIR}/atom"
 echo ""
-echo "Run: atom"
+if [ "$LINKED" = true ]; then
+  echo "Run: atom"
+else
+  echo "Run: source ${SHELL_RC} && atom"
+fi
