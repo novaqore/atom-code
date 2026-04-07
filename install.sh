@@ -14,26 +14,8 @@ else
 fi
 
 chmod +x "${INSTALL_DIR}/bin/atom"
-
-# Add to PATH if not already there
-SHELL_RC=""
-if [ -n "${ZSH_VERSION:-}" ] || [ -f "${HOME}/.zshrc" ]; then
-  SHELL_RC="${HOME}/.zshrc"
-elif [ -f "${HOME}/.bashrc" ]; then
-  SHELL_RC="${HOME}/.bashrc"
-fi
-
-if [ -n "${SHELL_RC}" ]; then
-  if ! grep -q '\.atom/bin' "${SHELL_RC}" 2>/dev/null; then
-    echo '' >> "${SHELL_RC}"
-    echo '# Atom CLI' >> "${SHELL_RC}"
-    echo 'export PATH="$HOME/.atom/bin:$PATH"' >> "${SHELL_RC}"
-    echo "Added ~/.atom/bin to PATH in ${SHELL_RC}"
-  fi
-fi
+sudo ln -sf "${INSTALL_DIR}/bin/atom" /usr/local/bin/atom
 
 echo ""
 echo "Atom installed successfully!"
-echo "  Location: ${INSTALL_DIR}/bin/atom"
-echo ""
-echo "Restart your terminal, then run: atom"
+echo "  Run: atom"
